@@ -1,18 +1,21 @@
-import { StatusBar } from 'expo-status-bar';
+
 import { useEffect, useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { PaperProvider, TextInput, Button } from 'react-native-paper';
 import * as Location from 'expo-location';
-
+import Homepage from './screens/Homepage';
+import { NavigationContainer } from '@react-navigation/native';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
 const personalCode = process.env.EXPO_PUBLIC_PERSONAL_CODE //API-Avain .env tiedostosta
 
+const Stack = createNativeStackNavigator();
 
 
 export default function App() {
 
 
-  const [weatherForecast, setWeatherForecast] = useState();
+
   const [haku, setHaku] = useState()
 
   const [region, setRegion] = useState({
@@ -22,7 +25,7 @@ export default function App() {
     longitudeDelta: 0.0221,
   })
 
-  //console.log(weatherForecast);
+
 
 
 
@@ -41,31 +44,18 @@ export default function App() {
     });
   }
 
-  const handleFetch = () => {
-    fetch(`https://api.openweathermap.org/data/2.5/forecast?lat=${region.latitude}&lon=${region.longitude}&appid=${personalCode}`)
-      .then(response => {
-        if (!response.ok)
-          throw new Error("Error in fetch:" + response.statusText + response.status);
 
-        return response.json()
-      })
-      .then(data => setWeatherForecast(data))
-
-      .catch(error => console.error(error));
-  }
 
   useEffect(() => { getLocation() }, []);
 
   return (
-    <View style={styles.container}>
-      <PaperProvider>
-
-        <Text>Open up App.js to start working on your app!</Text>
-        <TextInput placeholder='Hae säätietoja' onChangeText={text => setHaku(text)}></TextInput>
-        <Button mode="elevated" onPress={() => handleFetch()}><Text>Tietojen haku alkuun</Text></Button>
-        <StatusBar style="auto" />
-      </PaperProvider>
-    </View>
+    <PaperProvider>
+      <NavigationContainer>
+        <Stack.Navigator>
+          <Stack.Screen name="Homepage" options={{ headerShown: false }} component={Homepage} />
+        </Stack.Navigator>
+      </NavigationContainer>
+    </PaperProvider >
   );
 }
 
@@ -76,4 +66,5 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
+
 });
