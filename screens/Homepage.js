@@ -7,21 +7,25 @@ import * as Location from 'expo-location';
 
 const personalCode = process.env.EXPO_PUBLIC_PERSONAL_CODE //API-Avain .env tiedostosta
 
+const apikey = "66ed31c1c9fd4490011665mzge94039"; //Väliaikainen ratkaisu kordinaattien hakuun
 
 export default function Homepage() {
 
     const [weatherForecast, setWeatherForecast] = useState();
     const [haku, setHaku] = useState();
-    const [location, setLocation] = useState()
-    console.log(weatherForecast);
+    const [location, setLocation] = useState();
+    //console.log(weatherForecast);
 
 
     const [region, setRegion] = useState({
         latitude: 60.200692,
         longitude: 24.934302,
-        latitudeDelta: 0.0322,
-        longitudeDelta: 0.0221,
     })
+
+    //console.log(region);
+
+    useEffect(() => { getLocation() }, []); //Haetaan lokaatio kun avataan äppi
+    useEffect(() => handleFetch(), [region]) //tehdään haku kun region muuttuu
 
 
     const getLocation = async () => {
@@ -36,18 +40,15 @@ export default function Homepage() {
             latitude: location.coords.latitude,
             longitude: location.coords.longitude,
         });
+
     }
-
-
-
-
 
 
     const handleFetch = () => {
         fetch(`https://api.openweathermap.org/data/2.5/weather?lat=${region.latitude}&lon=${region.longitude}&lang=fi&units=metric&appid=${personalCode}`)
             .then(response => {
                 if (!response.ok)
-                    throw new Error("Error in fetch:" + response.statusText + response.status);
+                    throw new Error("Error in saa fetch:" + response.statusText + response.status);
 
                 return response.json()
             })
@@ -57,46 +58,91 @@ export default function Homepage() {
     }
 
 
-    useEffect(() => { getLocation() }, []);
+    const handleAddress = () => {
+        fetch(`https://geocode.maps.co/search?q=${haku}&api_key=${apikey}`)
+            .then(response => {
+                if (!response.ok)
+                    throw new Error("Error in address fetch:" + response.statusText + response.status);
 
-    //<ImageBackground blurRadius={70} resizeMode='cover' source={require('../assets/images/random.png')} style={styles.backimage} />
+                return response.json()
+            })
+
+            .then(data => {
+                if (!data?.[0]) return // jos ei dataa
+                setRegion({
+
+                    ...region,
+                    latitude: parseFloat(data[0].lat),
+                    longitude: parseFloat(data[0].lon),
+                })
+            }
+
+            )
+
+            .catch(err => console.error(err));
+
+    }
+    //Saadun aika rimpsun rakentelu + muunto milli sekunteksi
+    const timeConvert = (sunrise) => {
+        const date = new Date(sunrise * 1000)
+
+        let hours = date.getHours()
+        let minutes = date.getMinutes()
+
+        if (date.getHours() < 10) {
+            hours = "0" + date.getHours()
+        }
+        if (date.getMinutes() < 10) {
+            minutes = "0" + date.getMinutes()
+        }
+        return hours + ":" + minutes
+    }
+
+
+
+
     return (
         <SafeAreaProvider>
             <SafeAreaView style={styles.container} edges={['left', 'right']}>
                 <ImageBackground blurRadius={60} resizeMode='cover' source={require('../assets/images/random.png')} style={styles.backimage} >
+
                     <View style={styles.searchbar}>
-                        <Searchbar placeholder='Anna kaupunki' onChangeText={text => setHaku(text)} value={haku}></Searchbar>
-                        <Button mode="elevated" onPress={() => handleFetch()}>Hae</Button>
+                        <Searchbar placeholder='Anna kaupunki' onChangeText={text => setHaku(text)} onIconPress={handleAddress} value={haku}></Searchbar>
                     </View>
-                    {/*Ennuste */}
+
+                    {/*Ennuste 
+                    ?, jos ei oo vielä mitään näytettävää
+                    */}
                     <View style={styles.row}>
-                        <Text variant='displaySmall' style={styles.forecastlocation}>{weatherForecast.name}, </Text>
-                        <Text variant='displaySmall' style={styles.forecastlocation}>{weatherForecast.sys.country} </Text>
+                        <Text variant='displaySmall' style={styles.forecastlocation}>{weatherForecast?.name}, </Text>
+                        <Text variant='displaySmall' style={styles.forecastlocation}>{weatherForecast?.sys?.country} </Text>
 
                     </View>
-                    {/*Sää kuva*/}
+                    {/*Sää kuva
+                    Kesken
+                    */}
                     <View>
                         <Image style={styles.weatherpicture} source={require("../assets/images/sun.png")} />
                     </View>
                     {/*Asteet */}
                     <View>
-                        <Text variant='displayMedium' style={styles.decrees}>{weatherForecast.main.temp}&#176;</Text>
+                        <Text variant='displayMedium' style={styles.decrees}>{parseInt(weatherForecast?.main?.temp)}&#176;C</Text>
                     </View>
                     <View>
-                        <Text variant='displayMedium' style={styles.decreestext}>{weatherForecast.weather.description}</Text>
+                        <Text variant='displayMedium' style={styles.decreestext}>{weatherForecast?.weather?.[0].description}</Text>
                     </View>
                     <View style={styles.stats}>
                         <View style={styles.icons}>
                             <Icon source="weather-windy" size={40} color='lightgray'></Icon>
-                            <Text variant='bodyMedium' style={styles.icontext}>{weatherForecast.wind.speed}km/h</Text>
+                            <Text variant='bodyMedium' style={styles.icontext}>{weatherForecast?.wind?.speed}km/h</Text>
                         </View>
                         <View style={styles.icons}>
                             <Icon source="water-outline" size={40} color='lightgray'></Icon>
-                            <Text variant='bodyMedium' style={styles.icontext} >{weatherForecast.main.humidity}%</Text>
+                            <Text variant='bodyMedium' style={styles.icontext} >{weatherForecast?.main?.humidity}%</Text>
                         </View>
                         <View style={styles.icons}>
                             <Icon source="weather-sunset-up" size={40} color='lightgray'></Icon>
-                            <Text variant='bodyMedium' style={styles.icontext}>06:30</Text>
+                            <Text variant='bodyMedium' style={styles.icontext}>{timeConvert(weatherForecast?.sys?.sunrise)}</Text>
                         </View>
                     </View>
 
@@ -108,14 +154,16 @@ export default function Homepage() {
 
 const styles = StyleSheet.create({
     container: {
-        flex: 1,
+
+
     },
     backimage: {
-        flex: 1,
+        height: "100%",
         alignItems: 'center',
-        justifyContent: "center"
+        justifyContent: "space-evenly"
     },
     searchbar: {
+
         marginBottom: 30,
         alignItems: "flex-start",
         justifyContent: "center"
@@ -159,6 +207,9 @@ const styles = StyleSheet.create({
     },
     icontext: {
         color: "lightgrey"
+    },
+    haku: {
+        width: 200
     }
 
 });

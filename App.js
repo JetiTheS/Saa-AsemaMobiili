@@ -2,7 +2,7 @@
 import { useEffect, useState } from 'react';
 import { ImageBackground, Image, StyleSheet, Text, View } from 'react-native';
 import { PaperProvider, TextInput, Button } from 'react-native-paper';
-import * as Location from 'expo-location';
+
 import Homepage from './screens/Homepage';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
