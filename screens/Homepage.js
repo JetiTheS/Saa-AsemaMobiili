@@ -14,7 +14,7 @@ export default function Homepage() {
     const [weatherForecast, setWeatherForecast] = useState();
     const [haku, setHaku] = useState();
     const [location, setLocation] = useState();
-    //console.log(weatherForecast);
+    console.log(weatherForecast);
 
 
     const [region, setRegion] = useState({
@@ -122,7 +122,7 @@ export default function Homepage() {
                     Kesken
                     */}
                     <View>
-                        <Image style={styles.weatherpicture} source={require("../assets/images/sun.png")} />
+                        <Image style={styles.weatherpicture} source={{ uri: `https://openweathermap.org/img/wn/${weatherForecast?.weather?.[0].icon}@2x.png` }} />
                     </View>
                     {/*Asteet */}
                     <View>
@@ -143,6 +143,10 @@ export default function Homepage() {
                         <View style={styles.icons}>
                             <Icon source="weather-sunset-up" size={40} color='lightgray'></Icon>
                             <Text variant='bodyMedium' style={styles.icontext}>{timeConvert(weatherForecast?.sys?.sunrise)}</Text>
+                        </View>
+                        <View style={styles.icons}>
+                            <Icon source="weather-sunset-down" size={40} color='lightgray'></Icon>
+                            <Text variant='bodyMedium' style={styles.icontext}>{timeConvert(weatherForecast?.sys?.sunset)}</Text>
                         </View>
                     </View>
 
