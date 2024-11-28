@@ -7,19 +7,18 @@ import * as Location from 'expo-location';
 
 const personalCode = process.env.EXPO_PUBLIC_PERSONAL_CODE //API-Avain .env tiedostosta
 
-const apikey = "66ed31c1c9fd4490011665mzge94039"; //Väliaikainen ratkaisu kordinaattien hakuun
 
 export default function Homepage() {
 
     const [weatherForecast, setWeatherForecast] = useState();
     const [haku, setHaku] = useState();
     const [location, setLocation] = useState();
-    console.log(weatherForecast);
+    //console.log(weatherForecast);
 
 
     const [region, setRegion] = useState({
-        latitude: 60.200692,
-        longitude: 24.934302,
+        latitude: "",
+        longitude: "",
     })
 
     //console.log(region);
@@ -44,22 +43,10 @@ export default function Homepage() {
     }
 
 
-    const handleFetch = () => {
-        fetch(`https://api.openweathermap.org/data/2.5/weather?lat=${region.latitude}&lon=${region.longitude}&lang=fi&units=metric&appid=${personalCode}`)
-            .then(response => {
-                if (!response.ok)
-                    throw new Error("Error in saa fetch:" + response.statusText + response.status);
-
-                return response.json()
-            })
-            .then(data => setWeatherForecast(data))
-
-            .catch(error => console.error(error));
-    }
 
 
-    const handleAddress = () => {
-        fetch(`https://geocode.maps.co/search?q=${haku}&api_key=${apikey}`)
+    const handleAddress = async () => {
+        fetch(`http://api.openweathermap.org/geo/1.0/direct?q=${haku}&limit=${1}&appid=${personalCode}`)
             .then(response => {
                 if (!response.ok)
                     throw new Error("Error in address fetch:" + response.statusText + response.status);
@@ -82,6 +69,25 @@ export default function Homepage() {
             .catch(err => console.error(err));
 
     }
+
+
+
+    const handleFetch = () => {
+
+        fetch(`https://api.openweathermap.org/data/2.5/weather?lat=${region.latitude}&lon=${region.longitude}&lang=fi&units=metric&appid=${personalCode}`)
+            .then(response => {
+                if (!response.ok)
+                    throw new Error("Error in saa fetch:" + response.statusText + response.status);
+
+                return response.json()
+            })
+            .then(data => setWeatherForecast(data))
+
+            .catch(error => console.error(error));
+    }
+
+
+
     //Saadun aika rimpsun rakentelu + muunto milli sekunteksi
     const timeConvert = (sunrise) => {
         const date = new Date(sunrise * 1000)
@@ -170,7 +176,8 @@ const styles = StyleSheet.create({
 
         marginBottom: 30,
         alignItems: "flex-start",
-        justifyContent: "center"
+        justifyContent: "center",
+        marginHorizontal: 5
     },
     forecastlocation:
     {
