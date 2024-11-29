@@ -4,6 +4,7 @@ import { StatusBar } from 'expo-status-bar';
 import { useEffect, useState } from 'react';
 import { SafeAreaView, SafeAreaProvider } from 'react-native-safe-area-context';
 import * as Location from 'expo-location';
+import { weatherImages } from '../constants/importImage';
 
 const personalCode = process.env.EXPO_PUBLIC_PERSONAL_CODE //API-Avain .env tiedostosta
 
@@ -107,6 +108,7 @@ export default function Homepage() {
 
 
 
+
     return (
         <SafeAreaProvider>
             <SafeAreaView style={styles.container} edges={['left', 'right']}>
@@ -128,7 +130,7 @@ export default function Homepage() {
                     Kesken
                     */}
                     <View>
-                        <Image style={styles.weatherpicture} source={{ uri: `https://openweathermap.org/img/wn/${weatherForecast?.weather?.[0].icon}@2x.png` }} />
+                        <Image style={styles.weatherpicture} source={weatherImages[weatherForecast?.weather?.[0].icon]} />
                     </View>
                     {/*Asteet */}
                     <View>
