@@ -1,4 +1,4 @@
-import { Pressable, StyleSheet, View, ImageBackground, Touchable, Image } from 'react-native';
+import { Pressable, StyleSheet, View, ImageBackground, Touchable, Image, FlatList } from 'react-native';
 import { TextInput, Button, Searchbar, Icon, Text } from 'react-native-paper';
 import { StatusBar } from 'expo-status-bar';
 import { useEffect, useState } from 'react';
@@ -25,7 +25,7 @@ export default function Homepage() {
     //console.log(region);
 
     useEffect(() => { getLocation() }, []); //Haetaan lokaatio kun avataan äppi
-    useEffect(() => handleFetch(), [region]) //tehdään haku kun region muuttuu
+    useEffect(() => { region.latitude && region.longitude && handleFetch() }, [region]) //tehdään haku kun region muuttuu
 
 
     const getLocation = async () => {
@@ -75,7 +75,7 @@ export default function Homepage() {
 
     const handleFetch = () => {
 
-        fetch(`https://api.openweathermap.org/data/2.5/weather?lat=${region.latitude}&lon=${region.longitude}&lang=fi&units=metric&appid=${personalCode}`)
+        fetch(`https://api.openweathermap.org/data/2.5/forecast?lat=${region.latitude}&lon=${region.longitude}&lang=fi&units=metric&appid=${personalCode}`)
             .then(response => {
                 if (!response.ok)
                     throw new Error("Error in saa fetch:" + response.statusText + response.status);
@@ -90,8 +90,9 @@ export default function Homepage() {
 
 
     //Saadun aika rimpsun rakentelu + muunto milli sekunteksi
-    const timeConvert = (sunrise) => {
-        const date = new Date(sunrise * 1000)
+    const timeConvert = (timestamp) => {
+        timestamp += weatherForecast?.city?.timezone
+        const date = new Date(timestamp * 1000)
 
         let hours = date.getHours()
         let minutes = date.getMinutes()
@@ -122,42 +123,57 @@ export default function Homepage() {
                     ?, jos ei oo vielä mitään näytettävää
                     */}
                     <View style={styles.row}>
-                        <Text variant='displaySmall' style={styles.forecastlocation}>{weatherForecast?.name}, </Text>
-                        <Text variant='displaySmall' style={styles.forecastlocation}>{weatherForecast?.sys?.country} </Text>
+                        <Text variant='displaySmall' style={styles.forecastlocation}>{weatherForecast?.city?.name}, </Text>
+                        <Text variant='displaySmall' style={styles.forecastlocation}>{weatherForecast?.city?.country} </Text>
 
                     </View>
                     {/*Sää kuva
                     Kesken
                     */}
                     <View>
-                        <Image style={styles.weatherpicture} source={weatherImages[weatherForecast?.weather?.[0].icon]} />
+                        <Image style={styles.weatherpicture} source={weatherImages[weatherForecast?.list?.[0].weather?.[0].icon]} />
                     </View>
                     {/*Asteet */}
                     <View>
-                        <Text variant='displayMedium' style={styles.decrees}>{parseInt(weatherForecast?.main?.temp)}&#176;C</Text>
+                        <Text variant='displayMedium' style={styles.decrees}>{parseInt(weatherForecast?.list?.[0].main?.temp)}&#176;C</Text>
                     </View>
-                    <View>
-                        <Text variant='displayMedium' style={styles.decreestext}>{weatherForecast?.weather?.[0].description}</Text>
+                    <View style={styles.description}>
+                        <Text variant='displayMedium' style={styles.decreestext}>{weatherForecast?.list?.[0].weather?.[0].description}</Text>
                     </View>
                     <View style={styles.stats}>
                         <View style={styles.icons}>
                             <Icon source="weather-windy" size={40} color='lightgray'></Icon>
-                            <Text variant='bodyMedium' style={styles.icontext}>{weatherForecast?.wind?.speed}km/h</Text>
+                            <Text variant='bodyMedium' style={styles.icontext}>{weatherForecast?.list?.[0].wind?.speed}km/h</Text>
                         </View>
                         <View style={styles.icons}>
                             <Icon source="water-outline" size={40} color='lightgray'></Icon>
-                            <Text variant='bodyMedium' style={styles.icontext} >{weatherForecast?.main?.humidity}%</Text>
+                            <Text variant='bodyMedium' style={styles.icontext} >{weatherForecast?.list?.[0].main?.humidity}%</Text>
                         </View>
                         <View style={styles.icons}>
                             <Icon source="weather-sunset-up" size={40} color='lightgray'></Icon>
-                            <Text variant='bodyMedium' style={styles.icontext}>{timeConvert(weatherForecast?.sys?.sunrise)}</Text>
+                            <Text variant='bodyMedium' style={styles.icontext}>{timeConvert(weatherForecast?.city?.sunrise)}</Text>
                         </View>
                         <View style={styles.icons}>
                             <Icon source="weather-sunset-down" size={40} color='lightgray'></Icon>
-                            <Text variant='bodyMedium' style={styles.icontext}>{timeConvert(weatherForecast?.sys?.sunset)}</Text>
+                            <Text variant='bodyMedium' style={styles.icontext}>{timeConvert(weatherForecast?.city?.sunset)}</Text>
                         </View>
                     </View>
-
+                    <View>
+                        <FlatList
+                            data={weatherForecast?.list}
+                            keyExtractor={(item) => item.id}
+                            horizontal
+                            renderItem={({ item }) =>
+                                <View style={styles.flatlistitems}>
+                                    <Text style={styles.timesep}>
+                                        {timeConvert(item.dt)}
+                                    </Text>
+                                    <Text style={styles.itemdec}>
+                                        {parseInt(item.main?.temp)}&#176;
+                                    </Text>
+                                </View>}
+                        />
+                    </View>
                 </ImageBackground>
             </SafeAreaView>
         </SafeAreaProvider>
@@ -172,10 +188,10 @@ const styles = StyleSheet.create({
     backimage: {
         height: "100%",
         alignItems: 'center',
-        justifyContent: "space-evenly"
+        justifyContent: "flex-start"
     },
     searchbar: {
-
+        marginTop: 40,
         marginBottom: 30,
         alignItems: "flex-start",
         justifyContent: "center",
@@ -185,6 +201,7 @@ const styles = StyleSheet.create({
     {
         color: "white",
         fontWeight: "bold",
+        marginBottom: 20,
     }
     ,
     forecastlocationC:
@@ -199,19 +216,25 @@ const styles = StyleSheet.create({
     },
     weatherpicture: {
         width: 200,
-        height: 200
+        height: 200,
+        marginBottom: 20,
     },
     decrees: {
         color: "white",
-        fontWeight: "bold"
+        fontWeight: "bold",
+        marginBottom: 20,
     },
     decreestext: {
         color: "white",
 
     },
+    description: {
+        marginBottom: 20
+    },
     stats: {
         flexDirection: "row",
         justifyContent: "space-between",
+
     },
     icons: {
         flexDirection: "row",
@@ -223,6 +246,16 @@ const styles = StyleSheet.create({
     },
     haku: {
         width: 200
+    },
+    timesep: {
+        marginLeft: 3
+
+    },
+    flatlistitems: {
+        alignItems: "center"
+    },
+    itemdec: {
+
     }
 
 });

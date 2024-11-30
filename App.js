@@ -4,14 +4,16 @@ import { ImageBackground, Image, StyleSheet, Text, View } from 'react-native';
 import { PaperProvider, TextInput, Button } from 'react-native-paper';
 
 import Homepage from './screens/Homepage';
+import Mappage from './screens/Mappage';
 import { NavigationContainer } from '@react-navigation/native';
-import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import Ionicons from '@expo/vector-icons/Ionicons';
 
 
 
-const Stack = createNativeStackNavigator();
+const Tab = createBottomTabNavigator();
 
-
+//options={{ headerShown: false }}
 export default function App() {
 
 
@@ -26,10 +28,27 @@ export default function App() {
     <PaperProvider>
 
       <NavigationContainer>
+        <Tab.Navigator screenOptions={({ route }) => ({
+          tabBarIcon: ({ focused, color, size }) => {
 
-        <Stack.Navigator>
-          <Stack.Screen name="Homepage" options={{ headerShown: false }} component={Homepage} />
-        </Stack.Navigator>
+            let iconName;
+
+
+            if (route.name === 'Sää nyt') {
+              iconName = 'cloudy-outline';
+              color = "black"
+            } else if (route.name === 'Sääkartta') {
+              iconName = 'map';
+              color = "green";
+            }
+
+            return <Ionicons name={iconName} size={size} color={color} />;   //it returns an icon component
+          },
+        })}>
+          <Tab.Screen name="Sää nyt" options={{ headerShown: false }} component={Homepage} />
+          <Tab.Screen name="Sääkartta" options={{ headerShown: false }} component={Mappage} />
+        </Tab.Navigator>
+
       </NavigationContainer>
     </PaperProvider >
 
