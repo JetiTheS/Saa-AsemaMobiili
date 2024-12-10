@@ -4,6 +4,10 @@ import { useEffect, useState } from 'react';
 import { SafeAreaView, SafeAreaProvider } from 'react-native-safe-area-context';
 import * as Location from 'expo-location';
 import { weatherImages } from '../constants/importImage';
+import FiveDayList from "../constants/FiveDayList"
+
+import WeatherStats from '../constants/WeatherStats';
+
 
 const personalCode = process.env.EXPO_PUBLIC_PERSONAL_CODE //API-Avain .env tiedostosta
 
@@ -41,8 +45,6 @@ export function Homepage() {
         });
 
     }
-
-
 
 
     const handleAddress = async () => {
@@ -86,36 +88,9 @@ export function Homepage() {
     }
 
 
-
-    //Saadun aika rimpsun rakentelu + muunto milli sekunteksi + aika-alue korjaus
-    const timeConvert = (timestamp) => {
-        timestamp += weatherForecast?.city?.timezone
-        const date = new Date(timestamp * 1000)
-
-        let hours = date.getHours()
-        let minutes = date.getMinutes()
-
-        if (date.getHours() < 10) {
-            hours = "0" + date.getHours()
-        }
-        if (date.getMinutes() < 10) {
-            minutes = "0" + date.getMinutes()
-        }
-        return hours + ":" + minutes
-    }
-
-    //Päivän saanti ja rakentaminen listaa varten
-    const dayConvert = (timestamp) => {
-        timestamp += weatherForecast?.city?.timezone
-        const date = new Date(timestamp * 1000)
-        let day = date.getUTCDay()
-        const days = ["SU", "MA", "TI", "KE", "TO", "PE", "LA"]
-        return days[day]
-    }
-
     return (
         <SafeAreaProvider>
-            <SafeAreaView style={styles.container} edges={['left', 'right']}>
+            <SafeAreaView style={styles.container} edges={['left', 'bottom', 'right']}>
 
                 {/*Taustakuva*/}
 
@@ -155,72 +130,19 @@ export function Homepage() {
 
                     {/*Sää lisätiedot */}
 
-                    <View style={styles.stats}>
-                        <View style={styles.icons}>
-                            <Icon source="weather-windy" size={40} color='lightgray'></Icon>
-                            <Text variant='bodyMedium' style={styles.icontext}>{weatherForecast?.list?.[0].wind?.speed}m/s</Text>
-                        </View>
-                        <View style={styles.icons}>
-                            <Icon source="water-outline" size={40} color='lightgray'></Icon>
-                            <Text variant='bodyMedium' style={styles.icontext} >{weatherForecast?.list?.[0].main?.humidity}%</Text>
-                        </View>
-                        <View style={styles.icons}>
-                            <Icon source="weather-sunset-up" size={40} color='lightgray'></Icon>
-                            <Text variant='bodyMedium' style={styles.icontext}>{timeConvert(weatherForecast?.city?.sunrise)}</Text>
-                        </View>
-                        <View style={styles.icons}>
-                            <Icon source="weather-sunset-down" size={40} color='lightgray'></Icon>
-                            <Text variant='bodyMedium' style={styles.icontext}>{timeConvert(weatherForecast?.city?.sunset)}</Text>
-                        </View>
+                    <View>
+                        <WeatherStats weatherForecast={weatherForecast} />
                     </View>
 
                     {/*5 päivän sää listaus */}
-
                     <View>
                         <Text variant='bodyLarge' style={styles.fivedayhead}>5 Päivän sää</Text>
                     </View>
+
                     <View style={styles.headline} />
-                    <View style={styles.flatlist}>
-                        <View style={styles.fivedayitems}>
-                            <Text variant='bodyMedium' style={styles.fivedaytext}>Päivä</Text>
-                            <Text variant='bodyMedium' style={styles.fivedaytext}>Klo</Text>
-                            <Text variant='bodyMedium' style={styles.fivedaytext}>Sää</Text>
-                            <Text variant='bodyMedium' style={styles.fivedaytext}>&#176;C</Text>
-                            <Text variant='bodyMedium' style={styles.fivedaytext}>Tuntuu </Text>
-                            <Text variant='bodyMedium' style={styles.fivedaytext}>Tuuli</Text>
-                        </View>
-                        <View style={styles.line}></View>
-                        <FlatList
-                            data={weatherForecast?.list}
-                            keyExtractor={(item) => item.dt}
-                            ItemSeparatorComponent={<View style={styles.line}></View>}
 
-                            horizontal
-                            renderItem={({ item, index }) =>
-                                <View style={styles.flatlistitems}>
-                                    <Text variant='bodyMedium' style={styles.itemday}>
-                                        {dayConvert(weatherForecast?.list?.[index].dt)}
-                                    </Text>
-                                    <Text variant='bodyMedium' style={styles.itemtimesep}>
-                                        {timeConvert(item.dt)}
-                                    </Text>
+                    <FiveDayList weatherForecast={weatherForecast} />
 
-                                    <Image style={styles.weatherpicturesmall} source={weatherImages[weatherForecast?.list?.[index].weather?.[0].icon]} />
-
-                                    <Text variant='bodyMedium' style={styles.itemspace}>
-                                        {parseInt(item.main?.temp)}&#176;
-                                    </Text>
-
-                                    <Text variant='bodyMedium' style={styles.itemspace}>
-                                        {parseInt(item.main.feels_like)}&#176;
-                                    </Text>
-
-                                    <Text variant='bodyMedium' style={styles.itemspace}>
-                                        {item.wind.speed}
-                                    </Text>
-                                </View>}
-                        />
-                    </View>
                     <View style={styles.headline} />
 
                 </ImageBackground>
@@ -239,8 +161,8 @@ const styles = StyleSheet.create({
     },
 
     searchbar: {
-        marginTop: 40,
-        marginBottom: 25,
+        marginTop: 30,
+        marginBottom: 20,
         alignItems: "flex-start",
         justifyContent: "center",
         marginHorizontal: 5
@@ -264,15 +186,15 @@ const styles = StyleSheet.create({
     },
 
     weatherpicture: {
-        width: 200,
-        height: 200,
-        marginBottom: 20,
+        width: 190,
+        height: 190,
+        marginBottom: 18,
     },
 
     weatherpicturesmall: {
         width: 25,
         height: 25,
-        marginBottom: 15
+        marginBottom: 14
     },
 
     decrees: {
@@ -307,12 +229,14 @@ const styles = StyleSheet.create({
 
     itemtimesep: {
         marginHorizontal: 15,
-        marginVertical: 15
+        marginVertical: 15,
+        color: "lightgrey"
 
     },
 
     itemspace: {
-        marginBottom: 15
+        marginBottom: 15,
+        color: "lightgrey"
     },
 
     itemday: {
