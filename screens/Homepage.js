@@ -212,47 +212,6 @@ const styles = StyleSheet.create({
         marginBottom: 20
     },
 
-    stats: {
-        flexDirection: "row",
-        justifyContent: "space-between",
-        marginBottom: 20
-    },
-
-    icons: {
-        flexDirection: "row",
-        alignItems: "center",
-
-    },
-    icontext: {
-        color: "lightgrey"
-    },
-
-    itemtimesep: {
-        marginHorizontal: 15,
-        marginVertical: 15,
-        color: "lightgrey"
-
-    },
-
-    itemspace: {
-        marginBottom: 15,
-        color: "lightgrey"
-    },
-
-    itemday: {
-        marginTop: 15,
-        color: "lightgray"
-    },
-
-
-    flatlist: {
-        flexDirection: "row"
-    },
-
-    flatlistitems: {
-        alignItems: "center",
-    },
-
     line: {
         width: 1,
         backgroundColor: "gray",
@@ -262,12 +221,6 @@ const styles = StyleSheet.create({
         height: 1,
         width: "100%",
         backgroundColor: "lightgray",
-    },
-
-    fivedayitems: {
-        marginVertical: 15,
-        marginLeft: 5,
-        justifyContent: "space-between",
     },
 
     fivedayhead: {

@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { SafeAreaView, SafeAreaProvider } from 'react-native-safe-area-context';
 import * as Location from 'expo-location';
 import { weatherImages } from '../constants/importImage';
+import { LineChart } from "react-native-gifted-charts";
 
 
 
@@ -15,13 +16,17 @@ const personalCode = process.env.EXPO_PUBLIC_PERSONAL_CODE //API-Avain .env tied
 export default function Aurorapage() {
 
     const [auroraForecast, setAuroraForecast] = useState();
-    console.log(auroraForecast);
+    const [values, setValues] = useState([]);
+    //const [data, setData] = useState([{ value: 5 }, { value: 8 }, { value: 10 }, { value: 30 }]);
+    console.log(auroraForecast?.data);
 
-    useEffect(() => { region.latitude && region.longitude && handleAuroraFetch() }, []);
+
+
+    useEffect(() => { handleAuroraFetch() }, []);
 
     const handleAuroraFetch = () => {
 
-        fetch(`https://api.auroras.live/v1/?type=all&lat=${region.latitude}&long=${region.longitude}&forecast=false`)
+        fetch(`https://space.fmi.fi/MIRACLE/RWC/data/r_index_latest_fi.json`)
             .then(response => {
                 if (!response.ok)
                     throw new Error("Error in saa fetch:" + response.statusText + response.status);
@@ -30,14 +35,35 @@ export default function Aurorapage() {
             })
             .then(data => setAuroraForecast(data))
 
+
             .catch(error => console.error(error));
     }
-
+    /*
+        function handleAurora() {
+            for (let i in auroraForecast?.threeday?.values) {
+                for (let j in auroraForecast?.threeday?.values[i]) {
+    
+    
+    
+    
+                }
+    
+            }
+        }
+    <View>
+                            <LineChart data={data} />
+                        </View>*/
 
     return (
         <SafeAreaProvider>
             <SafeAreaView style={styles.container} edges={['left', 'bottom', 'right']}>
                 <ImageBackground blurRadius={50} resizeMode='cover' source={require('../assets/images/aurora.png')} style={styles.backimage} >
+                    <View>
+                        <Text variant="headlineLarge" style={styles.Kptext}>Revontulten todennäköisyys Suomessa</Text>
+                        <Text variant='displayMedium' style={styles.Kpvalue}></Text>
+                    </View>
+
+
                 </ImageBackground>
             </SafeAreaView>
         </SafeAreaProvider>
@@ -45,6 +71,17 @@ export default function Aurorapage() {
 }
 
 const styles = StyleSheet.create({
+
+    Kpvalue: {
+        color: "white",
+        fontWeight: "bold",
+        textAlign: "center",
+    },
+    Kptext: {
+        color: "lightgray",
+        textAlign: "center",
+        marginTop: 15
+    },
 
     backimage: {
         height: "100%",

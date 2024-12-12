@@ -12,8 +12,6 @@ export default function FiveDayList({ weatherForecast }) {
 
     return (
 
-
-
         <View style={styles.flatlist}>
             <View style={styles.fivedayitems}>
                 <Text variant='bodyMedium' style={styles.fivedaytext}>Päivä</Text>
@@ -56,49 +54,10 @@ export default function FiveDayList({ weatherForecast }) {
             />
         </View>
 
-
     )
 }
 
 const styles = StyleSheet.create({
-
-    backimage: {
-        height: "100%",
-        width: "100%",
-        alignItems: 'center',
-        justifyContent: "flex-start"
-    },
-
-    searchbar: {
-        marginTop: 30,
-        marginBottom: 20,
-        alignItems: "flex-start",
-        justifyContent: "center",
-        marginHorizontal: 5
-    },
-
-    forecastlocation: {
-        color: "white",
-        fontWeight: "bold",
-        marginBottom: 20,
-    },
-
-    forecastlocationC: {
-        color: "lightgrey",
-
-        fontWeight: "bold"
-    },
-
-    row: {
-        flexDirection: "row",
-        alignItems: "baseline"
-    },
-
-    weatherpicture: {
-        width: 190,
-        height: 190,
-        marginBottom: 18,
-    },
 
     weatherpicturesmall: {
         width: 25,
@@ -119,21 +78,6 @@ const styles = StyleSheet.create({
 
     description: {
         marginBottom: 20
-    },
-
-    stats: {
-        flexDirection: "row",
-        justifyContent: "space-between",
-        marginBottom: 20
-    },
-
-    icons: {
-        flexDirection: "row",
-        alignItems: "center",
-
-    },
-    icontext: {
-        color: "lightgrey"
     },
 
     itemtimesep: {
