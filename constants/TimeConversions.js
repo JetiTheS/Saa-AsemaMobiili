@@ -4,16 +4,7 @@ function timeConvert(timestamp, weatherForecast) {
     timestamp += weatherForecast?.city?.timezone
     const date = new Date(timestamp * 1000)
 
-    let hours = date.getHours()
-    let minutes = date.getMinutes()
-
-    if (date.getHours() < 10) {
-        hours = "0" + date.getHours()
-    }
-    if (date.getMinutes() < 10) {
-        minutes = "0" + date.getMinutes()
-    }
-    return hours + ":" + minutes
+    return formatDate(date)
 }
 export { timeConvert }
 
@@ -26,3 +17,20 @@ function dayConvert(timestamp, weatherForecast) {
     return days[day]
 }
 export { dayConvert }
+
+function formatDate(date) {
+    if (typeof date === "string") { //Jos string muuttaa ensin Dateksti
+        date = new Date(date)
+    }
+    let hours = date.getHours()
+    let minutes = date.getMinutes()
+
+    if (date.getHours() < 10) {
+        hours = "0" + date.getHours()
+    }
+    if (date.getMinutes() < 10) {
+        minutes = "0" + date.getMinutes()
+    }
+    return hours + ":" + minutes
+}
+export { formatDate }

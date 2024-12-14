@@ -3,8 +3,8 @@ import { Homepage } from './screens/Homepage';
 import Aurorapage from './screens/Aurorapage';
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import Ionicons from '@expo/vector-icons/Ionicons';
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
+
 
 //options={{ headerShown: false }}
 

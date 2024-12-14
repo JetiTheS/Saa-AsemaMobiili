@@ -1,5 +1,5 @@
 import { StyleSheet, View, ImageBackground, Image, FlatList } from 'react-native';
-import { Searchbar, Icon, Text } from 'react-native-paper';
+import { Searchbar, Text } from 'react-native-paper';
 import { useEffect, useState } from 'react';
 import { SafeAreaView, SafeAreaProvider } from 'react-native-safe-area-context';
 import * as Location from 'expo-location';
@@ -65,12 +65,9 @@ export function Homepage() {
                     longitude: parseFloat(data[0].lon),
                 })
             }
-
             )
             .catch(err => console.error(err));
-
     }
-
 
 
     const handleFetch = () => {
