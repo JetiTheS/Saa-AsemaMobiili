@@ -9,6 +9,8 @@ export default function Aurorapage() {
 
     const [auroraForecast, setAuroraForecast] = useState();
     const [selectedCode, setSelectedCode] = useState("NUR");
+    //console.log(auroraForecast);
+
 
 
     useEffect(() => { handleAuroraFetch() }, []);
@@ -18,7 +20,7 @@ export default function Aurorapage() {
         fetch(`https://space.fmi.fi/MIRACLE/RWC/data/r_index_latest_fi.json`)
             .then(response => {
                 if (!response.ok)
-                    throw new Error("Error in saa fetch:" + response.statusText + response.status);
+                    throw new Error("Error in aurora fetch:" + response.statusText + response.status);
 
                 return response.json()
             })
@@ -51,6 +53,9 @@ export default function Aurorapage() {
                         </View>
                         {auroraForecast &&
                             <View style={styles.forecast}>
+                                <Text variant='displaySmall' style={styles.klo}>
+                                    Viimeisin Mittaus:
+                                </Text>
                                 <Text variant='displaySmall' style={styles.klo}>
                                     Klo: {formatDate(auroraForecast[selectedCode]["Aika"])}
                                 </Text>
